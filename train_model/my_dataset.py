@@ -1,0 +1,48 @@
+# -*- coding: utf-8 -*-
+'''
+    :file: my_dataset.py
+    :author: -Farmer
+    :url: https://blog.farmer233.top
+    :date: 2022/01/19 15:05:20
+'''
+import os
+from torch.utils.data import DataLoader,Dataset
+import torchvision.transforms as transforms
+from PIL import Image
+import train_model.one_hot_encoding as ohe
+import setting
+
+class mydataset(Dataset):
+
+    def __init__(self, folder, transform=None):
+        self.train_image_file_paths = [os.path.join(folder, image_file) for image_file in os.listdir(folder)]
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.train_image_file_paths)
+
+    def __getitem__(self, idx):
+        image_root = self.train_image_file_paths[idx]
+        image_name = image_root.split(os.path.sep)[-1]
+        image = Image.open(image_root)
+        if self.transform is not None:
+            image = self.transform(image)
+        label = ohe.encode(image_name.split('.')[0])
+        return image, label
+
+transform = transforms.Compose([
+    transforms.Grayscale(),
+    transforms.ToTensor(),
+])
+
+def get_train_data_loader():
+    dataset = mydataset(setting.TRAIN_DATASET_PATH, transform=transform)
+    return DataLoader(dataset, batch_size=64, shuffle=True)
+
+def get_test_data_loader():
+    dataset = mydataset(setting.TEST_DATASET_PATH, transform=transform)
+    return DataLoader(dataset, batch_size=1, shuffle=True)
+
+def get_predict_data_loader():
+    dataset = mydataset(setting.PREDICT_DATASET_PATH, transform=transform)
+    return DataLoader(dataset, batch_size=1, shuffle=True)
