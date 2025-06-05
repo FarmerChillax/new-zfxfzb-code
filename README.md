@@ -1,4 +1,5 @@
 # 基于机器学习识别正方系统验证码
+> 本仓库仅存放训练相关代码，封装好的 SDK 请跳转：https://github.com/FarmerChillax/new-school-sdk
 
 正方教务系统验证码识别
 
